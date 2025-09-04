@@ -26,6 +26,10 @@ class Square extends Drawable {
                                      1, 1, 0, 1,
                                      -1, 1, 0, 1]);
 
+                                     const positions : vec3[] = [];
+                                     positions.push(vec3.fromValues(4,4,4));
+
+
     this.generateIdx();
     this.generatePos();
     this.generateNor();
