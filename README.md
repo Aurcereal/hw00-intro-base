@@ -6,7 +6,7 @@ For the fragment shader, I implemented 3D voronoi.  The cube renders the 2D inte
 
 Screenshots
 --------------------------
-![](src1.png)
+![](scr1.png)
 ![](scr2.png)
 ![](scr3.png)
 
