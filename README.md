@@ -1,5 +1,15 @@
 # HW 0: Intro to Javascript and WebGL
 
+Results
+--------------------------
+For the fragment shader, I implemented 3D voronoi.  The cube renders the 2D intersection of itself and the voronoi.  To create the outline effect on each of the cells, we use the distance of the sample point to the closest voronoi border; these borders exist where there are 2 voronoi cells that are equally distanced from the sample point.  We get this distance by doing an additional iteration over close voronoi cells after getting the closest voronoi cell and sampling the border between the closest cell and the other cells.  I use this distance for some glow effects in each cell.  The glow also varies over the entire object through some trig functions.  The cube rotates and its vertices oscillate through the vertex shader.
+
+![](src1.png)
+
+![](scr2.png)
+
+![](scr3.png)
+
 <p align="center">
   <img width="360" height="360" src="https://user-images.githubusercontent.com/1758825/132532354-e3a45402-e484-499e-bfa7-2d73b9f2c946.png">
 </p>
