@@ -48,6 +48,8 @@ vec3 randomMove(vec3 param, float t) { // ~ [0, 1]
 }
 
 vec3 voronoi(vec3 p) {
+    p *= 2.;
+
     vec3 op = p;
 
     // p += 0.75*normalize(p)*(sin(u_Time*.75)*.5+.5);
@@ -134,6 +136,9 @@ vec3 voronoi(vec3 p) {
     float repr = 1.;
     float lr = abs(mod(r, repr) - repr*.5);
     atten *= 1.+smoothstep(0.3, 0.1, lr);
+    atten += min(4., 0.1/(2.*currMinDist));
+
+    atten *= 0.8;
 
     return vec3(col*exists*atten);
 }
