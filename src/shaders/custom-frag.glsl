@@ -26,14 +26,6 @@ out vec4 out_Col; // This is the final output color that you will see on your
 
 ///
 
-// vec3 hash33( vec3 p ) {
-//     //return vec3(sin(p.y*1048.232),sin(p.x*6012.523),sin(p.z*6929.523))*vec3(.5)+vec3(.5);
-//     return fract(sin(vec3(dot(p,vec3(127.1, 311.7, 452.71)),
-//                           dot(p,vec3(269.5, 183.3, 959.2)),
-//                           dot(p, vec3(420.6, 631.2, 219.32))
-//                     )) * 43758.5453);
-// }
-
 vec3 hash33(vec3 p3) // From https://www.shadertoy.com/view/4djSRW
 {
 	p3 = fract(p3 * vec3(.1031, .1030, .0973));
@@ -48,12 +40,12 @@ vec3 randomMove(vec3 param, float t) { // ~ [0, 1]
 }
 
 vec3 voronoi(vec3 p) {
-    p *= 2.;
+    p *= 2.8;
 
     vec3 op = p;
 
-    // p += 0.75*normalize(p)*(sin(u_Time*.75)*.5+.5);
-    // p += 0.1*u_Time*vec3(0.2, 0.1, 0.25);
+    p += 0.75*normalize(p)*(sin(u_Time*.75)*.5+.5);
+    p += 0.1*u_Time*vec3(0.2, 0.1, 0.25);
 
     float moveT = 0.4*u_Time;
 
@@ -105,7 +97,7 @@ vec3 voronoi(vec3 p) {
 
                 vec3 currOrbWorldPos = currCellPos + currOrbPos;
                 vec3 diff = closestOrb - currOrbWorldPos;
-                if(dot(diff, diff) > gridSize*0.01) { // Same orb check
+                if(dot(diff, diff) > gridSize*0.001) { // Skip closest orb
                     vec3 dir = normalize(diff);
                     vec3 center = currOrbWorldPos + diff*.5;
                     d = min(d, dot(p-center, dir));
@@ -117,11 +109,11 @@ vec3 voronoi(vec3 p) {
 
     // Use the distance to voronoi border for effects
     d = max(0.0001, d);
-    // float repLen = 0.08;
+    // float repLen = 0.07;
     // float stripeFac = 0.2;
     // float ld = mod(d, repLen) - repLen*.5;
     // ld = abs(ld) - repLen*.5*stripeFac;
-    // float exists = step(ld, 0.);
+    // float stripeExists = step(ld, 0.);
 
     float exists = step(0.025, d) * step(d, 0.039) + step(0.065, d);
     
@@ -131,27 +123,35 @@ vec3 voronoi(vec3 p) {
     vec3 col = colors[colIndex];
 
     float atten = min(1., d*8.)+min(1.,0.01/d);
+    //atten -= stripeExists*.2;
 
-    float r = length(op)-.1*u_Time;
-    float repr = 1.;
-    float lr = abs(mod(r, repr) - repr*.5);
-    atten *= 1.+smoothstep(0.3, 0.1, lr);
+    // Additional Glow Highlight
     atten += min(4., 0.1/(2.*currMinDist));
 
-    atten *= 0.8;
+    // Pulsing
+    float r = length(op)-.1*u_Time;
+    r += cos(0.1*op.x*op.y*1.8+0.1*op.z*0.9+op.x*op.z*2.*0.2+op.y*1.4*0.2);
+    float repr = 2.;
+    float lr = abs(mod(r, repr) - repr*.5);
+    atten *= 1.+1.*smoothstep(0.7, 0.3, lr);
+
+    // Near End Darkening
+    atten *= .6+.4*smoothstep(3., 2.4, length(op));
+
+    atten *= 0.8*0.6;
 
     return vec3(col*exists*atten);
 }
 
 vec3 sampleCol(vec3 p) {
-    return voronoi(p);
+    return u_Color.rgb*voronoi(p);
 }
 ///
 
 void main()
 {
     // Material base color (before shading)
-        vec4 diffuseColor = u_Color;
+        vec4 diffuseColor = vec4(0.);//vec4(sampleCol(fs_Pos.xyz),1.)*u_Color;
 
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));

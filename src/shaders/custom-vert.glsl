@@ -35,8 +35,48 @@ out vec4 fs_Pos;
 const vec4 lightPos = vec4(5, 5, 3, 1); //The position of our virtual light, which is used to compute the shading of
                                         //the geometry in the fragment shader.
 
+mat3 rotZ(float o) {
+    return mat3(
+        cos(o), sin(o), 0., 
+        -sin(o), cos(o), 0.,
+        0., 0., 1.
+        );
+}
+
+mat3 rotX(float o) {
+    return mat3(
+        1., 0., 0., 
+        0., cos(o), sin(o),
+        0., -sin(o), cos(o)
+        );
+}
+
+vec3 sphericalToCartesian(vec3 spherical) {
+    return spherical.x * vec3(sin(spherical.z) * cos(spherical.y), cos(spherical.z), sin(spherical.z) * sin(spherical.y));
+}
+
+vec3 moveOnSphere(vec3 param, float t) {
+    vec3 spd = vec3(0.7, 1., 1.1) + param*vec3(.4, .3, .2);
+    vec3 off = param*vec3(453.32,62.21,15.59);
+    return sphericalToCartesian(vec3(sin(spd.x*t+off.x), spd.y*t+off.y, spd.z*t+off.z));
+}
+
+vec3 hash33(vec3 p3) // From https://www.shadertoy.com/view/4djSRW
+{
+	p3 = fract(p3 * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yxz+33.33);
+    return fract((p3.xxy + p3.yxx)*p3.zyx);
+}
+
 vec3 modify(vec3 p) {
-    return p; // TODO rotation
+    float t = 0.1*u_Time;
+
+    vec3 param = hash33(p);
+    vec3 sphereMove = moveOnSphere(param, t);
+    p += sphereMove*0.5;
+
+    p = rotZ(t*0.5) * rotX(t*0.7) * p;
+    return p;
 }
 
 void main()

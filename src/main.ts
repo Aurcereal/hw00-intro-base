@@ -103,7 +103,7 @@ function main() {
       currColor = col;
     }
     renderer.render(camera, customShader, [
-      icosphere,
+      //icosphere,
       //square,
       cube,
     ], currColor, timeSinceStart);
