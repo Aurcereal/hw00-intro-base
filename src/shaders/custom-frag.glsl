@@ -133,7 +133,7 @@ vec3 voronoi(vec3 p) {
     r += cos(0.1*op.x*op.y*1.8+0.1*op.z*0.9+op.x*op.z*2.*0.2+op.y*1.4*0.2);
     float repr = 2.;
     float lr = abs(mod(r, repr) - repr*.5);
-    atten *= 1.+1.4*smoothstep(0.7, 0.3, lr);
+    atten *= 0.8+1.6*smoothstep(0.7, 0.3, lr);
 
     // Near End Darkening
     atten *= .6+.4*smoothstep(3., 2.4, length(op));
